@@ -1,0 +1,14 @@
+How the game should work:
+
+
+Snake movement cases:
+
+case 1:  snake moving in straight line with no obstacles in front
+
+case 2: snake following its own tail
+
+case 3: snake eats an apple
+
+case 4: snake eats apple and follows snake?
+
+case 5: snake goes beyond border

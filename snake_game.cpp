@@ -10,6 +10,7 @@ const int HEIGHT = COLS * grid_square_size;
 const int WIDTH = ROWS * grid_square_size;
 
 bool grid_occupied[ROWS][COLS]{};
+int score = 1;
 
 typedef enum{
     UP,
@@ -116,17 +117,25 @@ int main(){
             //Process of eating the apple:
                 //When the snake's head is on top of the apple, the tail will not be covered, to achieve this
                 //we must check if the apple is eaten before covering the tail
-
-            grid_occupied[snake.head.y / grid_square_size][snake.head.x / grid_square_size] = true;
-            snake.body.push_front(snake.head);
+            
+            if ( (grid_occupied[snake.head.y / grid_square_size][snake.head.x / grid_square_size]) && (snake.head.y != snake.tail.y) && (snake.head.x != snake.tail.x)){
+                //game over
+                printf("Game Over!\n");
+                printf("Score: %d\n", score);
+                quit = true;
+            }
+            
+            snake.body.push_front(snake.head); //optimize later: don't need to push new heads, just update old ones
             if (snake.head.x == apple.x && snake.head.y == apple.y){
                 is_eaten = true;
+                score += 1;
             } else {
                 snake.last_tail = snake.tail;
                 snake.body.pop_back();
                 grid_occupied[snake.tail.y / grid_square_size][snake.tail.x / grid_square_size] = false;
                 snake.tail = snake.body.back();
             }
+            grid_occupied[snake.head.y / grid_square_size][snake.head.x / grid_square_size] = true;
             draw_snake(&snake, renderer);
 
             //checking the grid
@@ -155,22 +164,7 @@ int main(){
 }
 
 void draw_snake(Snake* snake, SDL_Renderer* &renderer){
-    //Draw new head
-    SDL_SetRenderDrawColor(renderer, snake_colour.r, snake_colour.g, snake_colour.b, snake_colour.a);
-    SDL_Rect fillRect{snake->head.x, snake->head.y, grid_square_size, grid_square_size};
-    SDL_RenderFillRect(renderer, &fillRect);
-
-    //Draw outline
-    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
-    //upper horizontal
-    SDL_RenderDrawLine(renderer, snake->head.x, snake->head.y, snake->head.x + grid_square_size, snake->head.y);
-    //lower horizontal
-    SDL_RenderDrawLine(renderer, snake->head.x, snake->head.y + grid_square_size, snake->head.x + grid_square_size, snake->head.y + grid_square_size);
-    //left vertical
-    SDL_RenderDrawLine(renderer, snake->head.x, snake->head.y, snake->head.x, snake->head.y + grid_square_size);
-    //right vertical
-    SDL_RenderDrawLine(renderer, snake->head.x + grid_square_size, snake->head.y, snake->head.x + grid_square_size, snake->head.y + grid_square_size);
-
+    
     //we'll need to draw the background over the tail 
     //if ( !((snake->head.x == snake->tail.x) && (snake->head.y == snake->tail.y)) ){
     SDL_SetRenderDrawColor(renderer, background.r, background.g, background.b, background.a);
@@ -185,7 +179,23 @@ void draw_snake(Snake* snake, SDL_Renderer* &renderer){
     SDL_RenderDrawLine(renderer, snake->last_tail.x, snake->last_tail.y, snake->last_tail.x, snake->last_tail.y + grid_square_size);
     //right vertical
     SDL_RenderDrawLine(renderer, snake->last_tail.x + grid_square_size, snake->last_tail.y, snake->last_tail.x + grid_square_size, snake->last_tail.y + grid_square_size);    
-    //} //the if statement won't be needed when i make the starting size of the snake larger
+    //} //the if statement won't be needed when i make the starting size of the snake larger    
+
+    //Draw new head
+    SDL_SetRenderDrawColor(renderer, snake_colour.r, snake_colour.g, snake_colour.b, snake_colour.a);
+    SDL_Rect fillRect{snake->head.x, snake->head.y, grid_square_size, grid_square_size};
+    SDL_RenderFillRect(renderer, &fillRect);
+    //Draw outline
+    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
+    //upper horizontal
+    SDL_RenderDrawLine(renderer, snake->head.x, snake->head.y, snake->head.x + grid_square_size, snake->head.y);
+    //lower horizontal
+    SDL_RenderDrawLine(renderer, snake->head.x, snake->head.y + grid_square_size, snake->head.x + grid_square_size, snake->head.y + grid_square_size);
+    //left vertical
+    SDL_RenderDrawLine(renderer, snake->head.x, snake->head.y, snake->head.x, snake->head.y + grid_square_size);
+    //right vertical
+    SDL_RenderDrawLine(renderer, snake->head.x + grid_square_size, snake->head.y, snake->head.x + grid_square_size, snake->head.y + grid_square_size);
+
 }
 
 void draw_apple(SDL_Point* apple, SDL_Renderer* &renderer){
