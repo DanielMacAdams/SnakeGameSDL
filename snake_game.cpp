@@ -22,6 +22,7 @@ typedef struct Snake{
     int direction;
     SDL_Point head;
     SDL_Point tail;
+    SDL_Point last_tail;
     std::deque<SDL_Point> body;
 };
 
@@ -44,7 +45,7 @@ int main(){
     }
 
     //draw starting snake
-    Snake snake{DOWN, {0, 0}, {0, 0}, {}};
+    Snake snake{DOWN, {0, 0}, {0, 0}, {0, 0}, {}};
     snake.body.push_front(snake.head);
     grid_occupied[0][0] = true;
     draw_snake(&snake, renderer);
@@ -100,7 +101,7 @@ int main(){
         }
 
         uint32_t temp = SDL_GetTicks();
-        if (temp - time > 500){
+        if (temp - time > 150){
             time = temp;
             if (snake.direction == UP){
                 snake.head.y -= grid_square_size;
@@ -112,16 +113,21 @@ int main(){
                 snake.head.x += grid_square_size;
             }
 
+            //Process of eating the apple:
+                //When the snake's head is on top of the apple, the tail will not be covered, to achieve this
+                //we must check if the apple is eaten before covering the tail
+
             grid_occupied[snake.head.y / grid_square_size][snake.head.x / grid_square_size] = true;
             snake.body.push_front(snake.head);
             if (snake.head.x == apple.x && snake.head.y == apple.y){
                 is_eaten = true;
             } else {
+                snake.last_tail = snake.tail;
                 snake.body.pop_back();
+                grid_occupied[snake.tail.y / grid_square_size][snake.tail.x / grid_square_size] = false;
+                snake.tail = snake.body.back();
             }
             draw_snake(&snake, renderer);
-            grid_occupied[snake.tail.y / grid_square_size][snake.tail.x / grid_square_size] = false;
-            snake.tail = snake.body.back();
 
             //checking the grid
             printf("=========================================\n");
@@ -168,18 +174,18 @@ void draw_snake(Snake* snake, SDL_Renderer* &renderer){
     //we'll need to draw the background over the tail 
     //if ( !((snake->head.x == snake->tail.x) && (snake->head.y == snake->tail.y)) ){
     SDL_SetRenderDrawColor(renderer, background.r, background.g, background.b, background.a);
-    SDL_Rect rect{snake->tail.x, snake->tail.y, grid_square_size, grid_square_size};
+    SDL_Rect rect{snake->last_tail.x, snake->last_tail.y, grid_square_size, grid_square_size};
     SDL_RenderFillRect(renderer, &rect);
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
     //upper horizontal
-    SDL_RenderDrawLine(renderer, snake->tail.x, snake->tail.y, snake->tail.x + grid_square_size, snake->tail.y);
+    SDL_RenderDrawLine(renderer, snake->last_tail.x, snake->last_tail.y, snake->last_tail.x + grid_square_size, snake->last_tail.y);
     //lower horizontal
-    SDL_RenderDrawLine(renderer, snake->tail.x, snake->tail.y + grid_square_size, snake->tail.x + grid_square_size, snake->tail.y + grid_square_size);
+    SDL_RenderDrawLine(renderer, snake->last_tail.x, snake->last_tail.y + grid_square_size, snake->last_tail.x + grid_square_size, snake->last_tail.y + grid_square_size);
     //left vertical
-    SDL_RenderDrawLine(renderer, snake->tail.x, snake->tail.y, snake->tail.x, snake->tail.y + grid_square_size);
+    SDL_RenderDrawLine(renderer, snake->last_tail.x, snake->last_tail.y, snake->last_tail.x, snake->last_tail.y + grid_square_size);
     //right vertical
-    SDL_RenderDrawLine(renderer, snake->tail.x + grid_square_size, snake->tail.y, snake->tail.x + grid_square_size, snake->tail.y + grid_square_size);    
-    //} the if statement won't be needed when i make the starting size of the snake larger
+    SDL_RenderDrawLine(renderer, snake->last_tail.x + grid_square_size, snake->last_tail.y, snake->last_tail.x + grid_square_size, snake->last_tail.y + grid_square_size);    
+    //} //the if statement won't be needed when i make the starting size of the snake larger
 }
 
 void draw_apple(SDL_Point* apple, SDL_Renderer* &renderer){
