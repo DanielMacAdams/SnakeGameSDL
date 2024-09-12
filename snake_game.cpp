@@ -58,8 +58,6 @@ int main(){
 
     SDL_RenderPresent(renderer);
 
-
-
     //use some timers
     uint32_t time = SDL_GetTicks();
 
@@ -113,8 +111,6 @@ int main(){
             } else if (snake.direction == RIGHT){
                 snake.head.x += grid_square_size;
             }
-            
-
 
             snake.last_tail = snake.tail;
             grid_occupied[snake.last_tail.y / grid_square_size][snake.last_tail.x / grid_square_size] = false;
@@ -170,7 +166,6 @@ int main(){
 void draw_snake(Snake* snake, SDL_Renderer* &renderer){
     
     //we'll need to draw the background over the tail 
-    //if ( !((snake->head.x == snake->tail.x) && (snake->head.y == snake->tail.y)) ){
     SDL_SetRenderDrawColor(renderer, background.r, background.g, background.b, background.a);
     SDL_Rect rect{snake->last_tail.x, snake->last_tail.y, grid_square_size, grid_square_size};
     SDL_RenderFillRect(renderer, &rect);
@@ -182,8 +177,7 @@ void draw_snake(Snake* snake, SDL_Renderer* &renderer){
     //left vertical
     SDL_RenderDrawLine(renderer, snake->last_tail.x, snake->last_tail.y, snake->last_tail.x, snake->last_tail.y + grid_square_size);
     //right vertical
-    SDL_RenderDrawLine(renderer, snake->last_tail.x + grid_square_size, snake->last_tail.y, snake->last_tail.x + grid_square_size, snake->last_tail.y + grid_square_size);    
-    //} //the if statement won't be needed when i make the starting size of the snake larger    
+    SDL_RenderDrawLine(renderer, snake->last_tail.x + grid_square_size, snake->last_tail.y, snake->last_tail.x + grid_square_size, snake->last_tail.y + grid_square_size);
 
     //Draw new head
     SDL_SetRenderDrawColor(renderer, snake_colour.r, snake_colour.g, snake_colour.b, snake_colour.a);
