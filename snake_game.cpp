@@ -113,30 +113,38 @@ int main(){
             } else if (snake.direction == RIGHT){
                 snake.head.x += grid_square_size;
             }
-
-            //Process of eating the apple:
-                //When the snake's head is on top of the apple, the tail will not be covered, to achieve this
-                //we must check if the apple is eaten before covering the tail
             
-            if ( (grid_occupied[snake.head.y / grid_square_size][snake.head.x / grid_square_size]) && (snake.head.y != snake.tail.y) && (snake.head.x != snake.tail.x)){
+
+
+            snake.last_tail = snake.tail;
+            grid_occupied[snake.last_tail.y / grid_square_size][snake.last_tail.x / grid_square_size] = false;
+
+            //detect a collision else update head
+            if ( grid_occupied[snake.head.y / grid_square_size][snake.head.x / grid_square_size] ){
                 //game over
                 printf("Game Over!\n");
                 printf("Score: %d\n", score);
                 quit = true;
+            } else {
+                grid_occupied[snake.head.y / grid_square_size][snake.head.x / grid_square_size] = true;
+                snake.body.push_front(snake.head);
             }
-            
-            snake.body.push_front(snake.head); //optimize later: don't need to push new heads, just update old ones
+
+            //detect if apple is eaten else update tail
             if (snake.head.x == apple.x && snake.head.y == apple.y){
                 is_eaten = true;
                 score += 1;
             } else {
-                snake.last_tail = snake.tail;
                 snake.body.pop_back();
-                grid_occupied[snake.tail.y / grid_square_size][snake.tail.x / grid_square_size] = false;
                 snake.tail = snake.body.back();
             }
-            grid_occupied[snake.head.y / grid_square_size][snake.head.x / grid_square_size] = true;
+            
             draw_snake(&snake, renderer);
+
+            if (is_eaten) {
+                draw_apple(&apple, renderer);
+                is_eaten = false;
+            }            
 
             //checking the grid
             printf("=========================================\n");
@@ -149,10 +157,6 @@ int main(){
             }
             printf("=========================================\n");
             
-            if (is_eaten) {
-                draw_apple(&apple, renderer);
-                is_eaten = false;
-            }
         }
         SDL_RenderPresent(renderer);
 
