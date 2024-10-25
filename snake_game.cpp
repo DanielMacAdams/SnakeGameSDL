@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <deque>
+#include <unordered_map>
 //#include <random>
 
 const int ROWS = 13;
@@ -27,6 +28,13 @@ typedef struct Snake{
     std::deque<SDL_Point> body;
 };
 
+typedef struct Apple{
+    SDL_Point pos;
+    bool is_eaten;
+};
+
+// std::unordered_map<long, SDL_Point> map{};
+
 SDL_Color background{0x32, 0xa8, 0x52, 0xFF};
 SDL_Color snake_colour{0x63, 0x27, 0x8f, 0xFF};
 SDL_Color apple_colour{0xa6, 0x08, 0x08, 0xFF};
@@ -52,9 +60,9 @@ int main(){
     draw_snake(&snake, renderer);
     
     //draw starting apple
-    SDL_Point apple{5, 5};
-    draw_apple(&apple, renderer);
-    bool is_eaten = false;
+    Apple apple{{5,5}, false};
+    draw_apple(&apple.pos, renderer);
+    apple.is_eaten = false;
 
     SDL_RenderPresent(renderer);
 
@@ -127,8 +135,8 @@ int main(){
             }
 
             //detect if apple is eaten else update tail
-            if (snake.head.x == apple.x && snake.head.y == apple.y){
-                is_eaten = true;
+            if (snake.head.x == apple.pos.x && snake.head.y == apple.pos.y){
+                apple.is_eaten = true;
                 score += 1;
             } else {
                 snake.body.pop_back();
@@ -137,9 +145,9 @@ int main(){
             
             draw_snake(&snake, renderer);
 
-            if (is_eaten) {
-                draw_apple(&apple, renderer);
-                is_eaten = false;
+            if (apple.is_eaten) {
+                draw_apple(&apple.pos, renderer);
+                apple.is_eaten = false;
             }            
 
             //checking the grid
@@ -197,6 +205,27 @@ void draw_snake(Snake* snake, SDL_Renderer* &renderer){
 }
 
 void draw_apple(SDL_Point* apple, SDL_Renderer* &renderer){
+
+    //How to pick a location not occupied by the snake
+    
+
+
+    //Plan: only when the apple is eaten (so in this function), generate a list of available points based on
+    //the grid_occupied array's current state. randomly select from this list.
+
+
+    //one alternative is to create hashset<long> and store the points (which are ints) into the long with bit manipulation
+    //that way I can store each available point in a hashset
+
+
+    //OOOOORRRRRR I can use a hashmap and store the long as the key and the point as the value, this would help avoid some
+    //unnecessary bit manipulation
+
+
+
+
+
+
 
     int range = ROWS;
     apple->x = (std::rand() % range) * grid_square_size;
