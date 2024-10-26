@@ -4,7 +4,7 @@
 #include <unordered_map>
 //#include <random>
 
-const int ROWS = 13;
+const int ROWS = 8;
 const int COLS = ROWS;
 const int grid_square_size = 100;
 const int HEIGHT = COLS * grid_square_size;
@@ -225,26 +225,31 @@ void draw_apple(SDL_Point* apple, SDL_Renderer* &renderer){
     //can use some profiling tools to see if this is worse performance wise 
 
     
+    //some weird bug is happening when the snake goes off screen where the grid occupied seems to be decreasing linearly?
+
     //Implementing Plan 1:
 
-    SDL_Point *available_points{new SDL_Point[ROWS*COLS - score]};
+    int size = ROWS*COLS - score;
+    SDL_Point *available_points{new SDL_Point[size]};
     int counter = 0;
     for (int row = 0; row < ROWS; ++row){
         for (int col = 0; col < COLS; ++col){
             if (!grid_occupied[row][col]){
-                available_points[counter].x = row * grid_square_size;
-                available_points[counter].y = col * grid_square_size;
+                available_points[counter].x = row;
+                available_points[counter].y = col;
                 ++counter;
             }
         }
     }
 
+    int random_point = (std::rand() % size);
+    // apple->x = (std::rand() % size) * grid_square_size;
+    // apple->y = (std::rand() % size) * grid_square_size;
+    apple->x = available_points[random_point].x * grid_square_size;
+    apple->y = available_points[random_point].y * grid_square_size;
+
     delete[] available_points;
 
-    int range = ROWS;
-    apple->x = (std::rand() % range) * grid_square_size;
-    apple->y = (std::rand() % range) * grid_square_size;
-    
     SDL_SetRenderDrawColor(renderer, apple_colour.r, apple_colour.g, apple_colour.b, apple_colour.a);
     SDL_Rect fillRect{apple->x, apple->y, grid_square_size, grid_square_size};
     SDL_RenderFillRect(renderer, &fillRect);
