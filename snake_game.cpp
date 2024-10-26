@@ -11,6 +11,7 @@ const int HEIGHT = COLS * grid_square_size;
 const int WIDTH = ROWS * grid_square_size;
 
 bool grid_occupied[ROWS][COLS]{};
+//std::unordered_map<int, SDL_Point> available_points{};
 int score = 1;
 
 typedef enum{
@@ -124,7 +125,7 @@ int main(){
             grid_occupied[snake.last_tail.y / grid_square_size][snake.last_tail.x / grid_square_size] = false;
 
             //detect a collision else update head
-            if ( grid_occupied[snake.head.y / grid_square_size][snake.head.x / grid_square_size] ){
+            if (grid_occupied[snake.head.y / grid_square_size][snake.head.x / grid_square_size]){
                 //game over
                 printf("Game Over!\n");
                 printf("Score: %d\n", score);
@@ -138,17 +139,12 @@ int main(){
             if (snake.head.x == apple.pos.x && snake.head.y == apple.pos.y){
                 apple.is_eaten = true;
                 score += 1;
+                snake.tail = snake.body.back();
+                grid_occupied[snake.tail.y / grid_square_size][snake.tail.x / grid_square_size] = true;
             } else {
                 snake.body.pop_back();
                 snake.tail = snake.body.back();
             }
-            
-            draw_snake(&snake, renderer);
-
-            if (apple.is_eaten) {
-                draw_apple(&apple.pos, renderer);
-                apple.is_eaten = false;
-            }            
 
             //checking the grid
             printf("=========================================\n");
@@ -160,7 +156,14 @@ int main(){
                 printf("|\n");
             }
             printf("=========================================\n");
-            
+
+            draw_snake(&snake, renderer);
+
+            if (apple.is_eaten) {
+                draw_apple(&apple.pos, renderer);
+                apple.is_eaten = false;
+            }            
+
         }
         SDL_RenderPresent(renderer);
 
@@ -210,22 +213,33 @@ void draw_apple(SDL_Point* apple, SDL_Renderer* &renderer){
     
 
 
-    //Plan: only when the apple is eaten (so in this function), generate a list of available points based on
-    //the grid_occupied array's current state. randomly select from this list.
+    // Plan 1: 
+    // only when the apple is eaten (so in this function), generate an array of available points based on
+    // the grid_occupied array's current state. randomly select from this array. This array will need to be dynamically allocated
 
+    // Plan 2:
+    // I can use a hashmap and store the key (//I'll just use the row/column information to make a unique key)
+    // and the point as the value, this would help avoid some
+    // unnecessary bit manipulation
 
-    //one alternative is to create hashset<long> and store the points (which are ints) into the long with bit manipulation
-    //that way I can store each available point in a hashset
+    //can use some profiling tools to see if this is worse performance wise 
 
+    
+    //Implementing Plan 1:
 
-    //OOOOORRRRRR I can use a hashmap and store the long as the key and the point as the value, this would help avoid some
-    //unnecessary bit manipulation
+    SDL_Point *available_points{new SDL_Point[ROWS*COLS - score]};
+    int counter = 0;
+    for (int row = 0; row < ROWS; ++row){
+        for (int col = 0; col < COLS; ++col){
+            if (!grid_occupied[row][col]){
+                available_points[counter].x = row * grid_square_size;
+                available_points[counter].y = col * grid_square_size;
+                ++counter;
+            }
+        }
+    }
 
-
-
-
-
-
+    delete[] available_points;
 
     int range = ROWS;
     apple->x = (std::rand() % range) * grid_square_size;
@@ -266,6 +280,8 @@ bool init(SDL_Window* &window, SDL_Renderer* &renderer){
             printf( "Renderer could not be created! SDL Error: %s\n", SDL_GetError() );
             return false;
         }
+
+        //draw background
         SDL_SetRenderDrawColor(renderer, background.r, background.g, background.b, background.a);
         SDL_RenderClear(renderer);
         SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xff);
@@ -291,7 +307,7 @@ bool init(SDL_Window* &window, SDL_Renderer* &renderer){
             SDL_RenderDrawLine(renderer, start_x, start_y, end_x, end_y);
         }
     }
-    
+
     return true;
 }
 
