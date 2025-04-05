@@ -1,51 +1,12 @@
-#include <SDL2/SDL.h>
-#include <iostream>
-#include <deque>
-#include <unordered_map>
-//#include <random>
-
-const int ROWS = 8;
-const int COLS = ROWS;
-const int grid_square_size = 100;
-const int HEIGHT = COLS * grid_square_size;
-const int WIDTH = ROWS * grid_square_size;
-
-bool grid_occupied[ROWS][COLS]{};
-//std::unordered_map<int, SDL_Point> available_points{};
-int score = 1;
-
-typedef enum{
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
-}DIRECTION;
-
-typedef struct Snake{
-    int direction;
-    SDL_Point head;
-    SDL_Point tail;
-    SDL_Point last_tail;
-    std::deque<SDL_Point> body;
-};
-
-typedef struct Apple{
-    SDL_Point pos;
-    bool is_eaten;
-};
-
-// std::unordered_map<long, SDL_Point> map{};
-
-SDL_Color background{0x32, 0xa8, 0x52, 0xFF};
-SDL_Color snake_colour{0x63, 0x27, 0x8f, 0xFF};
-SDL_Color apple_colour{0xa6, 0x08, 0x08, 0xFF};
+#include "snake_game.h"
 
 bool init(SDL_Window* &window, SDL_Renderer* &renderer);
 void close(SDL_Window* &window, SDL_Renderer* &renderer);
-void draw_snake(Snake* snake, SDL_Renderer* &renderer);
-void draw_apple(SDL_Point* apple, SDL_Renderer* &renderer);
 
 int main(){
+
+    bool grid_occupied[ROWS][COLS]{};
+    int score = 1;
 
     SDL_Window* window = NULL;
     SDL_Renderer* renderer = NULL;
@@ -55,16 +16,14 @@ int main(){
     }
 
     //draw starting snake
-    Snake snake{DOWN, {0, 0}, {0, 0}, {0, 0}, {}};
-    snake.body.push_front(snake.head);
+    Snake snake{};
     grid_occupied[0][0] = true;
-    draw_snake(&snake, renderer);
+    snake.draw(renderer);
     
     //draw starting apple
-    Apple apple{{5,5}, false};
-    draw_apple(&apple.pos, renderer);
-    apple.is_eaten = false;
-
+    Apple apple{};
+    apple.draw(renderer);
+    
     SDL_RenderPresent(renderer);
 
     //use some timers
@@ -72,14 +31,14 @@ int main(){
 
     //main loop
     bool quit = false;
-    SDL_Event e{};
+    SDL_Event event{};
     while(!quit){
         //Handle events on queue
-        while(SDL_PollEvent(&e) != 0){
-            if(e.type == SDL_QUIT){
+        while(SDL_PollEvent(&event) != 0){
+            if(event.type == SDL_QUIT){
                 quit = true;
-            } else if (e.type == SDL_KEYDOWN){
-                switch (e.key.keysym.sym)
+            } else if (event.type == SDL_KEYDOWN){
+                switch (event.key.keysym.sym)
                 {
                 case SDLK_q:
                     quit = true;
@@ -121,8 +80,7 @@ int main(){
                 snake.head.x += grid_square_size;
             }
 
-            snake.last_tail = snake.tail;
-            grid_occupied[snake.last_tail.y / grid_square_size][snake.last_tail.x / grid_square_size] = false;
+            grid_occupied[snake.tail.y / grid_square_size][snake.tail.x / grid_square_size] = false;
 
             //detect a collision else update head
             if (grid_occupied[snake.head.y / grid_square_size][snake.head.x / grid_square_size]){
@@ -136,7 +94,7 @@ int main(){
             }
 
             //detect if apple is eaten else update tail
-            if (snake.head.x == apple.pos.x && snake.head.y == apple.pos.y){
+            if (snake.head.x == apple.position.x && snake.head.y == apple.position.y){
                 apple.is_eaten = true;
                 score += 1;
                 snake.tail = snake.body.back();
@@ -157,10 +115,10 @@ int main(){
             }
             printf("=========================================\n");
 
-            draw_snake(&snake, renderer);
+            snake.draw(renderer);
 
             if (apple.is_eaten) {
-                draw_apple(&apple.pos, renderer);
+                apple.draw(renderer);
                 apple.is_eaten = false;
             }            
 
@@ -172,99 +130,6 @@ int main(){
     close(window, renderer);
 
     return 0;
-}
-
-void draw_snake(Snake* snake, SDL_Renderer* &renderer){
-    
-    //we'll need to draw the background over the tail 
-    SDL_SetRenderDrawColor(renderer, background.r, background.g, background.b, background.a);
-    SDL_Rect rect{snake->last_tail.x, snake->last_tail.y, grid_square_size, grid_square_size};
-    SDL_RenderFillRect(renderer, &rect);
-    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
-    //upper horizontal
-    SDL_RenderDrawLine(renderer, snake->last_tail.x, snake->last_tail.y, snake->last_tail.x + grid_square_size, snake->last_tail.y);
-    //lower horizontal
-    SDL_RenderDrawLine(renderer, snake->last_tail.x, snake->last_tail.y + grid_square_size, snake->last_tail.x + grid_square_size, snake->last_tail.y + grid_square_size);
-    //left vertical
-    SDL_RenderDrawLine(renderer, snake->last_tail.x, snake->last_tail.y, snake->last_tail.x, snake->last_tail.y + grid_square_size);
-    //right vertical
-    SDL_RenderDrawLine(renderer, snake->last_tail.x + grid_square_size, snake->last_tail.y, snake->last_tail.x + grid_square_size, snake->last_tail.y + grid_square_size);
-
-    //Draw new head
-    SDL_SetRenderDrawColor(renderer, snake_colour.r, snake_colour.g, snake_colour.b, snake_colour.a);
-    SDL_Rect fillRect{snake->head.x, snake->head.y, grid_square_size, grid_square_size};
-    SDL_RenderFillRect(renderer, &fillRect);
-    //Draw outline
-    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
-    //upper horizontal
-    SDL_RenderDrawLine(renderer, snake->head.x, snake->head.y, snake->head.x + grid_square_size, snake->head.y);
-    //lower horizontal
-    SDL_RenderDrawLine(renderer, snake->head.x, snake->head.y + grid_square_size, snake->head.x + grid_square_size, snake->head.y + grid_square_size);
-    //left vertical
-    SDL_RenderDrawLine(renderer, snake->head.x, snake->head.y, snake->head.x, snake->head.y + grid_square_size);
-    //right vertical
-    SDL_RenderDrawLine(renderer, snake->head.x + grid_square_size, snake->head.y, snake->head.x + grid_square_size, snake->head.y + grid_square_size);
-
-}
-
-void draw_apple(SDL_Point* apple, SDL_Renderer* &renderer){
-
-    //How to pick a location not occupied by the snake
-    
-
-
-    // Plan 1: 
-    // only when the apple is eaten (so in this function), generate an array of available points based on
-    // the grid_occupied array's current state. randomly select from this array. This array will need to be dynamically allocated
-
-    // Plan 2:
-    // I can use a hashmap and store the key (//I'll just use the row/column information to make a unique key)
-    // and the point as the value, this would help avoid some
-    // unnecessary bit manipulation
-
-    //can use some profiling tools to see if this is worse performance wise 
-
-    
-    //some weird bug is happening when the snake goes off screen where the grid occupied seems to be decreasing linearly?
-
-    //Implementing Plan 1:
-
-    int size = ROWS*COLS - score;
-    SDL_Point *available_points{new SDL_Point[size]};
-    int counter = 0;
-    for (int row = 0; row < ROWS; ++row){
-        for (int col = 0; col < COLS; ++col){
-            if (!grid_occupied[row][col]){
-                available_points[counter].x = row;
-                available_points[counter].y = col;
-                ++counter;
-            }
-        }
-    }
-
-    int random_point = (std::rand() % size);
-    // apple->x = (std::rand() % size) * grid_square_size;
-    // apple->y = (std::rand() % size) * grid_square_size;
-    apple->x = available_points[random_point].x * grid_square_size;
-    apple->y = available_points[random_point].y * grid_square_size;
-
-    delete[] available_points;
-
-    SDL_SetRenderDrawColor(renderer, apple_colour.r, apple_colour.g, apple_colour.b, apple_colour.a);
-    SDL_Rect fillRect{apple->x, apple->y, grid_square_size, grid_square_size};
-    SDL_RenderFillRect(renderer, &fillRect);
-
-    //Draw outline
-    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
-    //upper horizontal
-    SDL_RenderDrawLine(renderer, apple->x, apple->y, apple->x + grid_square_size, apple->y);
-    //lower horizontal
-    SDL_RenderDrawLine(renderer, apple->x, apple->y + grid_square_size, apple->x + grid_square_size, apple->y + grid_square_size);
-    //left vertical
-    SDL_RenderDrawLine(renderer, apple->x, apple->y, apple->x, apple->y + grid_square_size);
-    //right vertical
-    SDL_RenderDrawLine(renderer, apple->x + grid_square_size, apple->y, apple->x + grid_square_size, apple->y + grid_square_size);    
-
 }
 
 bool init(SDL_Window* &window, SDL_Renderer* &renderer){
