@@ -32,7 +32,7 @@ public:
     SDL_Color colour{}; //{0x63, 0x27, 0x8f, 0xFF};
 
     Snake();
-    void draw(SDL_Renderer* renderer) const;
+    void draw(SDL_Renderer* renderer, SDL_Point* back) const;
 };
 
 class Apple{
@@ -42,7 +42,7 @@ public:
     bool is_eaten{};
 
     Apple();
-    void draw(SDL_Renderer* renderer) const;
+    void draw(SDL_Renderer* renderer);
 };
 
 #endif

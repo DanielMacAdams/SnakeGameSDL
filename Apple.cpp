@@ -4,10 +4,11 @@ Apple::Apple()
     : position{500, 500}, colour{0xa6, 0x08, 0x08, 0xFF}, is_eaten{false}
 {}
 
-void Apple::draw(SDL_Renderer* renderer) const{
+void Apple::draw(SDL_Renderer* renderer){
 
-    // position.x = (std::rand() % size) * grid_square_size;
-    // position.y = (std::rand() % size) * grid_square_size;
+    int size = 10;
+    position.x = (std::rand() % size) * grid_square_size;
+    position.y = (std::rand() % size) * grid_square_size;
 
     SDL_SetRenderDrawColor(renderer, colour.r, colour.g, colour.b, colour.a);
     SDL_Rect fillRect{position.x, position.y, grid_square_size, grid_square_size};

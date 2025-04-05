@@ -17,9 +17,9 @@ int main(){
 
     //draw starting snake
     Snake snake{};
+    snake.draw(renderer, nullptr);
     grid_occupied[0][0] = true;
-    snake.draw(renderer);
-    
+
     //draw starting apple
     Apple apple{};
     apple.draw(renderer);
@@ -80,7 +80,10 @@ int main(){
                 snake.head.x += grid_square_size;
             }
 
-            grid_occupied[snake.tail.y / grid_square_size][snake.tail.x / grid_square_size] = false;
+            // Step 1. move head forward
+            // Step 2. check for collision (can check for collision last because apple should never spawn inside snake)
+            // Step 3. if apple is eaten now, do not move tail
+            // Step 4. if apple is not eaten, move tail
 
             //detect a collision else update head
             if (grid_occupied[snake.head.y / grid_square_size][snake.head.x / grid_square_size]){
@@ -94,15 +97,17 @@ int main(){
             }
 
             //detect if apple is eaten else update tail
+            SDL_Point* back = nullptr;
             if (snake.head.x == apple.position.x && snake.head.y == apple.position.y){
                 apple.is_eaten = true;
                 score += 1;
-                snake.tail = snake.body.back();
-                grid_occupied[snake.tail.y / grid_square_size][snake.tail.x / grid_square_size] = true;
             } else {
+                grid_occupied[snake.tail.y / grid_square_size][snake.tail.x / grid_square_size] = false;
+                back = &snake.body.back();
                 snake.body.pop_back();
                 snake.tail = snake.body.back();
             }
+            snake.draw(renderer, back);
 
             //checking the grid
             printf("=========================================\n");
@@ -115,11 +120,9 @@ int main(){
             }
             printf("=========================================\n");
 
-            snake.draw(renderer);
-
             if (apple.is_eaten) {
-                apple.draw(renderer);
                 apple.is_eaten = false;
+                apple.draw(renderer);
             }            
 
         }
