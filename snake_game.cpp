@@ -6,8 +6,6 @@ void close(SDL_Window* &window, SDL_Renderer* &renderer);
 int main(){
 
     bool grid_occupied[ROWS][COLS]{};
-    std::unordered_set<SDL_Point*>{};
-    
     int score = 1;
 
     SDL_Window* window = NULL;
@@ -24,7 +22,7 @@ int main(){
 
     //draw starting apple
     Apple apple{};
-    apple.draw(renderer);
+    apple.draw(renderer, grid_occupied);
     
     SDL_RenderPresent(renderer);
 
@@ -124,7 +122,7 @@ int main(){
 
             if (apple.is_eaten) {
                 apple.is_eaten = false;
-                apple.draw(renderer);
+                apple.draw(renderer, grid_occupied);
             }            
 
         }
