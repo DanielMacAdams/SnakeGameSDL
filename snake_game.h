@@ -4,10 +4,10 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <deque>
-#include <unordered_set>
+#include <vector>
 
 // Global Constants
-const int ROWS = 10;
+const int ROWS = 8;
 const int COLS = ROWS;
 const int grid_square_size = 100;
 const int HEIGHT = COLS * grid_square_size;
@@ -42,7 +42,7 @@ public:
     bool is_eaten{};
 
     Apple();
-    void draw(SDL_Renderer* renderer);
+    void draw(SDL_Renderer* renderer, bool (&grid)[ROWS][COLS]);
 };
 
 #endif
