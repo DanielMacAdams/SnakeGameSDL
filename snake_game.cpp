@@ -6,6 +6,8 @@ void close(SDL_Window* &window, SDL_Renderer* &renderer);
 int main(){
 
     bool grid_occupied[ROWS][COLS]{};
+    std::unordered_set<SDL_Point*>{};
+    
     int score = 1;
 
     SDL_Window* window = NULL;

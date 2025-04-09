@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <deque>
-#include <unordered_map>
+#include <unordered_set>
 
 // Global Constants
 const int ROWS = 10;
