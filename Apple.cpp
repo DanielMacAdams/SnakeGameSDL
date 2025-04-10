@@ -10,7 +10,7 @@ void Apple::draw(SDL_Renderer* renderer, bool (&grid)[ROWS][COLS]){
     for (int row = 0; row < ROWS; ++row){
         for (int col = 0; col < COLS; ++col){
             if(!grid[row][col]){
-                printf("SDL POINT: {%d, %d}\n", row*grid_square_size, col*grid_square_size);
+                //printf("SDL POINT: {%d, %d}\n", row*grid_square_size, col*grid_square_size);
                 // Remember: SDL_Point.y corresponds to the row, SDL_Point.x to the column
                 v_points.push_back({col*grid_square_size, row*grid_square_size});
             }
@@ -24,7 +24,7 @@ void Apple::draw(SDL_Renderer* renderer, bool (&grid)[ROWS][COLS]){
     position.x = rnd_point.x;
     position.y = rnd_point.y;
 
-    printf("SPAWN POINT: {%d, %d}\n", position.x, position.y);
+    //printf("SPAWN POINT: {%d, %d}\n", position.x, position.y);
 
     SDL_SetRenderDrawColor(renderer, colour.r, colour.g, colour.b, colour.a);
     SDL_Rect fillRect{position.x, position.y, grid_square_size, grid_square_size};

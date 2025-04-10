@@ -61,14 +61,14 @@ int main(){
                     break;                    
 
                 default:
-                    quit = true;
+                    quit = false;
                     break;
                 }
             }          
         }
 
         uint32_t temp = SDL_GetTicks();
-        if (temp - time > 150){
+        if (temp - time > 350){
             time = temp;
             if (snake.direction == UP){
                 snake.head.y -= grid_square_size;
@@ -110,15 +110,15 @@ int main(){
             snake.draw(renderer, back);
 
             //checking the grid
-            printf("=========================================\n");
-            for (int row = 0; row < ROWS; row++){
-                printf("|");
-                for (int col = 0; col < COLS; col++){
-                    printf(" %d ", grid_occupied[row][col]);
-                }
-                printf("|\n");
-            }
-            printf("=========================================\n");
+            // printf("=========================================\n");
+            // for (int row = 0; row < ROWS; row++){
+            //     printf("|");
+            //     for (int col = 0; col < COLS; col++){
+            //         printf(" %d ", grid_occupied[row][col]);
+            //     }
+            //     printf("|\n");
+            // }
+            // printf("=========================================\n");
 
             if (apple.is_eaten) {
                 apple.is_eaten = false;
