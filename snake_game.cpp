@@ -68,7 +68,7 @@ int main(){
         }
 
         uint32_t temp = SDL_GetTicks();
-        if (temp - time > 350){
+        if (temp - time > 150){
             time = temp;
             if (snake.direction == UP){
                 snake.head.y -= grid_square_size;
@@ -193,4 +193,8 @@ void close(SDL_Window* &window, SDL_Renderer* &renderer){
 	//Quit SDL subsystems
 	// IMG_Quit();
 	SDL_Quit();
+}
+
+int multiply(int a, int b){
+    return a * b;
 }
