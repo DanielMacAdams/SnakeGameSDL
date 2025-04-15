@@ -1,6 +1,6 @@
 # content of test_sample.py
 import pytest
-import snakeGame
+import snake_game
 
 def test_multiply():
-    assert snakeGame.multiply(4, 5) == 20
+    assert snake_game.multiply(4, 5) == 20

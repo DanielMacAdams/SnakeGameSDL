@@ -17,7 +17,7 @@ void Apple::draw(SDL_Renderer* renderer, bool (&grid)[ROWS][COLS]){
         }
     }
 
-    int rnd{std::rand() % v_points.size()};
+    int rnd{std::rand() % (int)v_points.size()};
     SDL_assert(rnd >= 0 && rnd < v_points.size());
     SDL_Point rnd_point{v_points[rnd]};
 

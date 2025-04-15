@@ -19,7 +19,6 @@ LINKER_FLAGS = -lSDL2
 
 #OBJ_NAME specifies the name of our exectuable
 OBJ_NAME = snake_game
-OBJ_NAME_BINDING = snakeGame
 
 #This is the target that compiles our executable
 all : $(OBJS)
@@ -29,7 +28,7 @@ debug : $(OBJS)
 	$(CC) $(OBJS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
 
 bindings :
-	$(CC) -O3 -Wall -shared -std=c++20 -fPIC $(INC) $(OBJS_BINDING) $(LINKER_FLAGS) -o $(OBJ_NAME_BINDING)$(EXT)
+	$(CC) -O3 -Wall -shared -std=c++20 -fPIC $(INC) $(OBJS_BINDING) $(LINKER_FLAGS) -o $(OBJ_NAME)$(EXT)
 
 clean :
-	rm $(OBJ_NAME) $(OBJ_NAME_BINDING)$(EXT)
+	rm $(OBJ_NAME) $(OBJ_NAME)$(EXT)
