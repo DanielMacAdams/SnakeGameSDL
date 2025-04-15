@@ -22,6 +22,9 @@ typedef enum{
     RIGHT,
 }DIRECTION;
 
+// Function declarations
+int multiply(int a, int b);
+
 // Class Definitions
 class Snake{
 public:
